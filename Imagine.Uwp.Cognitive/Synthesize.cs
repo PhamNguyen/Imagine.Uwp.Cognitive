@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Imagine.Uwp.Cognitive
 {
+
     /// <summary>
     /// Sample synthesize request
     /// </summary>
@@ -27,6 +28,16 @@ namespace Imagine.Uwp.Cognitive
         /// </summary>
         private SpeechConfig config;
 
+        public static async Task<Synthesize> Create(String apiKey)
+        {
+            if (String.IsNullOrEmpty(apiKey))
+                throw new Exception("Please enter Bing Speech API Key");
+            Synthesize cortana = new Synthesize(new SpeechConfig() { Locale = "en-US" });
+            Authentication authen = await Authentication.Create(apiKey);
+
+            return cortana;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Synthesize"/> class.
         /// </summary>
@@ -34,7 +45,7 @@ namespace Imagine.Uwp.Cognitive
         public Synthesize(SpeechConfig input)
         {
             this.config = input;
-            
+
         }
 
         /// <summary>
@@ -93,7 +104,7 @@ namespace Imagine.Uwp.Cognitive
                         {
 
                             var httpStream = await responseMessage.Result.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                         
+
                             this.AudioAvailable(new GenericEventArgs<Stream>(httpStream));
 
                         }
@@ -116,6 +127,79 @@ namespace Imagine.Uwp.Cognitive
                 },
                 TaskContinuationOptions.AttachedToParent,
                 cancellationToken);
+
+            return saveTask;
+        }
+
+        public Task Speak(String text, String locale = null)
+        {
+            var cookieContainer = new CookieContainer();
+            var handler = new HttpClientHandler() { CookieContainer = cookieContainer };
+            var client = new HttpClient(handler);
+
+            config = new SpeechConfig(text);
+
+            if (!String.IsNullOrEmpty(locale))
+                config.Locale = locale;
+
+            foreach (var header in this.config.Headers)
+            {
+                client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+            }
+
+            var genderValue = "";
+            switch (this.config.VoiceType)
+            {
+                case Gender.Male:
+                    genderValue = "Male";
+                    break;
+                case Gender.Female:
+                default:
+                    genderValue = "Female";
+                    break;
+
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Post, this.config.RequestUri)
+            {
+                Content = new StringContent(String.Format(SsmlTemplate, this.config.Locale, genderValue, this.config.VoiceName, this.config.Text))
+            };
+
+            var httpTask = client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, CancellationToken.None);
+            Debug.WriteLine("Response status code: [{0}]", httpTask.Result.StatusCode);
+
+            var saveTask = httpTask.ContinueWith(
+                async (responseMessage, token) =>
+                {
+                    try
+                    {
+                        if (responseMessage.IsCompleted && responseMessage.Result != null && responseMessage.Result.IsSuccessStatusCode)
+                        {
+
+                            var httpStream = await responseMessage.Result.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+                            this.AudioAvailable(new GenericEventArgs<Stream>(httpStream));
+
+                        }
+                        else
+                        {
+                            this.Error(new GenericEventArgs<Exception>(new Exception(String.Format("Service returned {0}", responseMessage.Result.StatusCode))));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        this.Error(new GenericEventArgs<Exception>(e.GetBaseException()));
+                    }
+                    finally
+                    {
+                        //responseMessage.Dispose();
+                        request.Dispose();
+                        client.Dispose();
+                        handler.Dispose();
+                    }
+                },
+                TaskContinuationOptions.AttachedToParent,
+                CancellationToken.None);
 
             return saveTask;
         }
@@ -161,15 +245,33 @@ namespace Imagine.Uwp.Cognitive
                 this.OutputFormat = AudioOutputFormat.Riff16Khz16BitMonoPcm;
             }
 
+            public SpeechConfig(String text)
+            {
+                this.Text = text;
+                this.Locale = "en-us";
+                this.VoiceName = "Microsoft Server Speech Text to Speech Voice (en-US, ZiraRUS)";
+                // Default to Riff16Khz16BitMonoPcm output format.
+                this.OutputFormat = AudioOutputFormat.Riff16Khz16BitMonoPcm;
+            }
+
+            public SpeechConfig(String text, String locale)
+            {
+                this.Locale = locale;
+                this.Text = Text;
+                this.VoiceName = "Microsoft Server Speech Text to Speech Voice (en-US, ZiraRUS)";
+                // Default to Riff16Khz16BitMonoPcm output format.
+                this.OutputFormat = AudioOutputFormat.Riff16Khz16BitMonoPcm;
+            }
+
             /// <summary>
             /// Gets or sets the request URI.
             /// </summary>
-            public Uri RequestUri { get; set; }
+            public Uri RequestUri { get; set; } = new Uri("https://speech.platform.bing.com/synthesize");
 
             /// <summary>
             /// Gets or sets the audio output format.
             /// </summary>
-            public AudioOutputFormat OutputFormat { get; set; }
+            public AudioOutputFormat OutputFormat { get; set; } = AudioOutputFormat.Riff8Khz8BitMonoMULaw;
 
             /// <summary>
             /// Gets or sets the headers.
@@ -204,7 +306,7 @@ namespace Imagine.Uwp.Cognitive
 
                     toReturn.Add(new KeyValuePair<string, string>("X-Microsoft-OutputFormat", outputFormat));
                     // authorization Header
-                    toReturn.Add(new KeyValuePair<string, string>("Authorization", this.AuthorizationToken));
+                    toReturn.Add(new KeyValuePair<string, string>("Authorization", Authentication.AccessToken));
                     // Refer to the doc
                     toReturn.Add(new KeyValuePair<string, string>("X-Search-AppId", "07D3234E49CE426DAA29772419F436CA"));
                     // Refer to the doc
@@ -223,12 +325,12 @@ namespace Imagine.Uwp.Cognitive
             /// <summary>
             /// Gets or sets the locale.
             /// </summary>
-            public String Locale { get; set; }
+            public String Locale { get; set; } = "en-US";
 
             /// <summary>
             /// Gets or sets the type of the voice; male/female.
             /// </summary>
-            public Gender VoiceType { get; set; }
+            public Gender VoiceType { get; set; } = Gender.Female;
 
             /// <summary>
             /// Gets or sets the name of the voice.
@@ -247,4 +349,54 @@ namespace Imagine.Uwp.Cognitive
         }
     }
 
+    public enum Language
+    {
+        English,
+        French,
+        Russian,
+        German,
+        Spanish,
+        NotSupport
+    }
+
+    public class SupportedLanguage
+    {
+        public static String English
+        {
+            get
+            {
+                return "en-Us";
+            }
+        }
+
+        public static String French
+        {
+            get
+            {
+                return "fr-FR";
+            }
+        }
+        public static String Russian
+        {
+            get
+            {
+                return "ru-RU";
+            }
+        }
+        public static String German
+        {
+            get
+            {
+                return "de-DE";
+            }
+        }
+        public static String Spanish
+        {
+            get
+            {
+                return "es-ES";
+            }
+        }
+
+    }
 }

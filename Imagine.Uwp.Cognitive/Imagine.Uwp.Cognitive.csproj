@@ -108,9 +108,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication.cs" />
+    <Compile Include="CortanaView.xaml.cs">
+      <DependentUpon>CortanaView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Synthesize.cs" />
     <EmbeddedResource Include="Properties\Imagine.Uwp.Cognitive.rd.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="CortanaView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -16,22 +16,25 @@ namespace Imagine.Uwp.Cognitive
     public class Authentication
     {
         public static readonly string AccessUri = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken";
-        private static string apiKey;
-        private string accessToken;
+        private string apiKey;
+        public static string AccessToken;
         private Timer accessTokenRenewer;
 
         //Access token expires every 10 minutes. Renew it every 9 minutes only.
         private const int RefreshTokenDuration = 9;
 
-        public Authentication(String apiKey, Action callback = null) {
-            Auth(apiKey, callback);
+        public static async Task<Authentication> Create(String apiKey, Action callback = null)
+        {
+            var authen = new Authentication();
+            await authen.Auth(apiKey, callback);
+            return authen;
         }
 
         public async Task Auth(string apiKey, Action callback = null)
         {
-            apiKey = apiKey;
+            this.apiKey = apiKey;
 
-            this.accessToken = await HttpPost(AccessUri, apiKey);
+            AccessToken = await HttpPost(AccessUri, this.apiKey);
 
             // renew the token every specfied minutes
             accessTokenRenewer = new Timer(new TimerCallback(OnTokenExpiredCallback),
@@ -43,25 +46,25 @@ namespace Imagine.Uwp.Cognitive
 
         public string GetAccessToken()
         {
-            return this.accessToken;
+            return AccessToken;
         }
 
         private async Task RenewAccessToken()
         {
-            string newAccessToken = await HttpPost(AccessUri, apiKey);
+            string newAccessToken = await HttpPost(AccessUri, this.apiKey);
             //swap the new token with old one
             //Note: the swap is thread unsafe
-            this.accessToken = newAccessToken;
+            AccessToken = newAccessToken;
             Debug.WriteLine(string.Format("Renewed token for user: {0} is: {1}",
-                              apiKey,
-                              this.accessToken));
+                              this.apiKey,
+                              AccessToken));
         }
 
-        private async void OnTokenExpiredCallback(object stateInfo)
+        private void OnTokenExpiredCallback(object stateInfo)
         {
             try
             {
-                await RenewAccessToken();
+                RenewAccessToken();
             }
             catch (Exception ex)
             {
@@ -90,6 +93,8 @@ namespace Imagine.Uwp.Cognitive
 
             using (WebResponse webResponse = await webRequest.GetResponseAsync())
             {
+                if (webResponse == null)
+                    return null;
                 using (Stream stream = webResponse.GetResponseStream())
                 {
                     using (MemoryStream ms = new MemoryStream())
