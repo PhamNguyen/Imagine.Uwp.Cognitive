@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Imagine.Uwp.Cognitive")]
+[assembly: AssemblyTitle("Cognitive for Universal Windows Platform")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Imagine.Uwp.Cognitive")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCompany("Imagine Studio")]
+[assembly: AssemblyProduct("Imagine Cognitive")]
+[assembly: AssemblyCopyright("Copyright © Imagine Studio  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
