@@ -65,15 +65,7 @@ namespace Imagine.Uwp.Cognitive
                     break;
             }
         }
-
-        private SpeechPlatform platform;
-
-        public SpeechPlatform Platform
-        {
-            get { return platform; }
-            set { platform = value; }
-        }
-
+        
         private String code = "en-US";
 
         private Synthesize cortana;
