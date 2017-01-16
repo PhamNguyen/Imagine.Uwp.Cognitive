@@ -107,20 +107,30 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Authentication.cs" />
-    <Compile Include="CortanaView.xaml.cs">
+    <Compile Include="Speak\Authentication.cs" />
+    <Compile Include="Speak\CortanaView.xaml.cs">
       <DependentUpon>CortanaView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Translator\AzureAuthToken.cs" />
+    <Compile Include="Translator\ITranslatorClient.cs" />
+    <Compile Include="Translator\TranslatorClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Synthesize.cs" />
+    <Compile Include="Speak\Synthesize.cs" />
     <EmbeddedResource Include="Properties\Imagine.Uwp.Cognitive.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="CortanaView.xaml">
+    <Page Include="Speak\CortanaView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Imagine.Uwp.Kits\Imagine.Uwp.Kits\Imagine.Uwp.Kits\Imagine.Uwp.Kits.csproj">
+      <Project>{a9f7a37d-61e8-4e8d-8a68-6c0da5248c51}</Project>
+      <Name>Imagine.Uwp.Kits</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
