@@ -107,6 +107,9 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpHelper\HttpHelper.cs" />
+    <Compile Include="HttpHelper\HttpHelperRequest.cs" />
+    <Compile Include="HttpHelper\HttpHelperResponse.cs" />
     <Compile Include="Speak\Authentication.cs" />
     <Compile Include="Speak\CortanaView.xaml.cs">
       <DependentUpon>CortanaView.xaml</DependentUpon>
@@ -123,12 +126,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Imagine.Uwp.Kits\Imagine.Uwp.Kits\Imagine.Uwp.Kits\Imagine.Uwp.Kits.csproj">
-      <Project>{a9f7a37d-61e8-4e8d-8a68-6c0da5248c51}</Project>
-      <Name>Imagine.Uwp.Kits</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

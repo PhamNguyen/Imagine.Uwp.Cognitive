@@ -10,7 +10,6 @@
 // THE CODE OR THE USE OR OTHER DEALINGS IN THE CODE.
 // ******************************************************************
 
-using Imagine.Uwp.Kits.Utilities.Http;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
