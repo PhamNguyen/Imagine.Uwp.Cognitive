@@ -1,4 +1,15 @@
-﻿
+﻿// ******************************************************************
+// Copyright (c) 2017 by Nguyen Pham. All rights reserved.
+// This code is licensed under the MIT License (MIT).
+// THE CODE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
+// THE CODE OR THE USE OR OTHER DEALINGS IN THE CODE.
+// ******************************************************************
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -267,6 +278,7 @@ namespace Imagine.Uwp.Cognitive
             /// Gets or sets the request URI.
             /// </summary>
             public Uri RequestUri { get; set; } = new Uri("https://speech.platform.bing.com/synthesize");
+            //public Uri RequestUri { get; set; } = new Uri("https://api.cognitive.microsoft.com/sts/v1.0");
 
             /// <summary>
             /// Gets or sets the audio output format.
